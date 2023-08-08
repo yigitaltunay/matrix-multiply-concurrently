@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"encoding/json"
 	"math/rand"
+	"os"
 	"time"
 )
 
@@ -21,4 +23,33 @@ func CreateMatrix(rows, cols int) [][]int {
 		}
 	}
 	return matrix
+}
+
+func SaveMatrixToFile(matrix [][]int, filename string) error {
+	file, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	if err := encoder.Encode(matrix); err != nil {
+		return err
+	}
+	return nil
+}
+
+func LoadMatrixFromFile(filename string) ([][]int, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	var matrix [][]int
+	decoder := json.NewDecoder(file)
+	if err := decoder.Decode(&matrix); err != nil {
+		return nil, err
+	}
+	return matrix, nil
 }
